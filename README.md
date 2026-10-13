@@ -80,7 +80,7 @@ Se cambian en **Configuración → Atajos de teclado** (clic derecho en el icono
 
 ## Instalación
 
-1. Descarga `Klip-Setup-x.y.z.exe` desde [Releases](https://github.com/LudwigAngel/klip/releases).
+1. Descarga `Klip-Setup-0.3.1.exe` desde [Releases](https://github.com/LudwigAngel/klip/releases).
 2. Ejecútalo. No necesita permisos de administrador.
 3. Como el instalador no está firmado digitalmente, Windows SmartScreen puede avisar: pulsa
    **Más información → Ejecutar de todos modos**.
