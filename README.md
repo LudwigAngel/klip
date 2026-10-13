@@ -4,6 +4,12 @@
 
 <p align="center"><b>Herramienta gratuita y de código abierto para capturas y grabaciones de pantalla en Windows.</b></p>
 
+<p align="center">
+  <a href="https://github.com/LudwigAngel/klip/releases/latest"><img alt="Descargar" src="https://img.shields.io/github/v/release/LudwigAngel/klip?label=descargar&color=5b5bf7"></a>
+  <a href="https://github.com/LudwigAngel/klip/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/LudwigAngel/klip/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="LICENSE"><img alt="Licencia MIT" src="https://img.shields.io/badge/licencia-MIT-e15bf7"></a>
+</p>
+
 Klip nace como un aporte a la comunidad: una alternativa libre para Windows inspirada en el flujo de trabajo de
 [CleanShot X](https://cleanshot.com), la conocida app de macOS. Es para quien quiera usarla, estudiarla, mejorarla o
 compartirla. ¡Las contribuciones son bienvenidas!
@@ -113,10 +119,13 @@ Tecnología: Electron, JavaScript sin frameworks, [gifenc](https://github.com/ma
 
 ## Contribuir
 
-- Abre un *issue* para reportar errores o proponer ideas.
-- Haz *fork*, crea una rama, y envía un *pull request*. Ejecuta `npm run check` y `npm run smoke` antes.
+Lee la [guía de contribución](CONTRIBUTING.md). En resumen:
+
+- [Reporta un error o propone una idea](https://github.com/LudwigAngel/klip/issues/new/choose) con las plantillas.
+- Haz *fork*, crea una rama desde `main` y envía un *pull request*. Ejecuta `npm run check` y `npm run smoke`
+  antes; GitHub Actions repite las pruebas en Windows en cada pull request.
 - Ideas pendientes: captura con scroll, dibujar en vivo durante la grabación, mostrar clics y teclas,
-  editor de vídeo (recortar), historial de capturas, versión para Linux.
+  editor de vídeo (recortar), historial de capturas.
 
 ## Licencia
 

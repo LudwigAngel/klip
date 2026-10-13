@@ -1,0 +1,56 @@
+# Checks every push to main and every pull request on a real Windows machine:
+# syntax check, packaging, and Klip's own smoke test (capture, OCR, windows,
+# MP4/GIF recording, every page, editor tools).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Revisar sintaxis
+        run: npm run check
+
+      - name: Empaquetar (sin instalador)
+        run: npm run dist:dir
+
+      - name: Prueba automática (smoke) de la app empaquetada
+        shell: pwsh
+        run: |
+          $env:KLIP_SMOKE = '1'
+          $p = Start-Process -FilePath 'dist/win-unpacked/Klip.exe' -NoNewWindow -PassThru `
+            -RedirectStandardOutput smoke.txt -RedirectStandardError smoke-err.txt
+          if (-not $p.WaitForExit(180000)) { $p.Kill(); Write-Error 'La prueba superó los 3 minutos'; exit 1 }
+          $out = Get-Content smoke.txt -Encoding UTF8
+          $out | Select-String 'SMOKE|RENDERER|PRELOAD' | ForEach-Object { $_.Line }
+          $out | Select-String 'SMOKE' | ForEach-Object { "- $($_.Line)" } | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          # Pages that fail to boot or throw are real bugs.
+          if (-not ($out | Select-String 'SMOKE pages: .*editor.*settings')) { Write-Error 'No arrancaron todas las páginas'; exit 1 }
+          if ($out | Select-String 'RENDERER (error|3) |PRELOAD_ERROR|SMOKE editorTools: ERROR') { Write-Error 'Errores en las páginas'; exit 1 }
+          # Screen/OCR/recording depend on the runner's desktop session: report, don't fail.
+          $env_issues = $out | Select-String 'SMOKE (screenshot|ocr\w*|windows|record\w+): ERROR'
+          if ($env_issues) { $env_issues | ForEach-Object { "::warning::$($_.Line)" } }

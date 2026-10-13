@@ -1,0 +1,86 @@
+# Builds the Windows installer and attaches it to a GitHub Release.
+#
+# How to publish a version:
+#   1. Bump "version" in package.json (e.g. 0.3.2) and merge to main.
+#   2. Either push a matching tag:  git tag v0.3.2 && git push origin v0.3.2
+#      or publish a release in the GitHub UI with tag v0.3.2.
+#   3. This workflow builds Klip-Setup-0.3.2.exe and uploads it to that release.
+#
+# It can also be run by hand from the Actions tab (workflow_dispatch) for an
+# existing tag.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  release:
+    types: [published] # releases created in the GitHub UI
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Etiqueta existente a compilar (p. ej. v0.3.1)'
+        required: true
+
+permissions:
+  contents: write # create the release and upload the installer
+
+concurrency:
+  group: release-${{ github.event.inputs.tag || github.event.release.tag_name || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      TAG: ${{ github.event.inputs.tag || github.event.release.tag_name || github.ref_name }}
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false' # no code-signing certificate
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Comprobar que la etiqueta coincide con package.json
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          if ("v$version" -ne $env:TAG) {
+            Write-Error "La etiqueta $env:TAG no coincide con la versión de package.json (v$version)."
+            exit 1
+          }
+          "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Revisar sintaxis
+        run: npm run check
+
+      - name: Compilar instalador
+        run: npm run dist
+
+      - name: Publicar en el Release
+        shell: pwsh
+        run: |
+          $exe = "dist/Klip-Setup-$env:VERSION.exe"
+          if (-not (Test-Path $exe)) { Write-Error "No se generó $exe"; exit 1 }
+          $hash = (Get-FileHash $exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  Klip-Setup-$env:VERSION.exe" | Out-File -Encoding ascii "dist/Klip-Setup-$env:VERSION.exe.sha256"
+          gh release view $env:TAG *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $env:TAG --title "Klip $env:VERSION" --generate-notes --verify-tag
+          }
+          gh release upload $env:TAG $exe "dist/Klip-Setup-$env:VERSION.exe.sha256" --clobber
+          "Publicado $exe (SHA-256 $hash)" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Klip-Setup-${{ env.VERSION }}
+          path: dist/Klip-Setup-*.exe
+          retention-days: 14
