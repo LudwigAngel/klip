@@ -1,7 +1,7 @@
 {
   "name": "klip",
   "productName": "Klip",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Herramienta de capturas de pantalla para Windows: captura, anota, fija, graba y extrae texto.",
   "author": "LudwigAngel",
   "license": "MIT",

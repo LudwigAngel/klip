@@ -1,6 +1,8 @@
-# Klip
+<p align="center"><img src="docs/logo.svg" width="112" height="112" alt="Logo de Klip"></p>
 
-**Herramienta gratuita y de código abierto para capturas y grabaciones de pantalla en Windows.**
+<h1 align="center">Klip</h1>
+
+<p align="center"><b>Herramienta gratuita y de código abierto para capturas y grabaciones de pantalla en Windows.</b></p>
 
 Klip nace como un aporte a la comunidad: una alternativa libre para Windows inspirada en el flujo de trabajo de
 [CleanShot X](https://cleanshot.com), la conocida app de macOS. Es para quien quiera usarla, estudiarla, mejorarla o

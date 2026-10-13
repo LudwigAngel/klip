@@ -1,37 +1,14 @@
-// Writes build/icon.ico (16-256 px) using the same drawing as src/icon.js,
-// encoded as 32-bit BMP entries so no image library is needed.
+// Writes build/icon.ico (16-256 px) from the shared logo rasterizer
+// (src/logo-raster.js), encoded as 32-bit BMP entries: no image library needed.
 import { mkdirSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 
-function drawBGRA(size) {
-  const buf = Buffer.alloc(size * size * 4);
-  const r = size * 0.22;
-  const inside = (x, y) => {
-    const cx = Math.min(Math.max(x, r), size - 1 - r);
-    const cy = Math.min(Math.max(y, r), size - 1 - r);
-    return (x - cx) ** 2 + (y - cy) ** 2 <= r * r;
-  };
-  const m = Math.round(size * 0.25), len = Math.round(size * 0.2), t = Math.max(2, Math.round(size * 0.08));
-  const hi = size - 1 - m;
-  const bracket = (x, y) => {
-    const nearL = x >= m && x < m + t, nearR = x <= hi && x > hi - t;
-    const nearT = y >= m && y < m + t, nearB = y <= hi && y > hi - t;
-    const armX = (x >= m && x < m + len) || (x <= hi && x > hi - len);
-    const armY = (y >= m && y < m + len) || (y <= hi && y > hi - len);
-    return ((nearL || nearR) && armY) || ((nearT || nearB) && armX);
-  };
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      if (!inside(x, y)) continue;
-      const i = (y * size + x) * 4, w = bracket(x, y);
-      buf[i] = w ? 255 : 0xf7; buf[i + 1] = w ? 255 : 0x5b; buf[i + 2] = w ? 255 : 0x5b; buf[i + 3] = 255;
-    }
-  }
-  return buf;
-}
+const require = createRequire(import.meta.url);
+const { drawLogo } = require('../src/logo-raster.js');
 
 /** One ICO image entry: BITMAPINFOHEADER + bottom-up BGRA pixels + AND mask. */
 function bmpEntry(size) {
-  const px = drawBGRA(size);
+  const px = drawLogo(size, { premultiplied: false });
   const header = Buffer.alloc(40);
   header.writeUInt32LE(40, 0);
   header.writeInt32LE(size, 4);
