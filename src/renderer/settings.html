@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; media-src 'self' mediastream:">
+  <title>Klip — Configuración</title>
+  <style>
+    :root { --bg: #1e1e24; --panel: #26262e; --line: #3a3a45; --text: #e8e8ee; --muted: #a0a0ad; --accent: #5b5bf7;
+      --ok: #34c759; --warn: #ff9f0a; --bad: #ff453a; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font: 13px "Segoe UI", system-ui, sans-serif; }
+    .app { display: grid; grid-template-columns: 190px 1fr; grid-template-rows: 1fr auto; height: 100%; }
+    nav { grid-row: 1 / 3; background: var(--panel); border-right: 1px solid var(--line); padding: 16px 8px; }
+    nav h1 { font-size: 15px; margin: 0 10px 16px; display: flex; align-items: center; gap: 8px; }
+    nav h1 span { width: 18px; height: 18px; border-radius: 5px; background: var(--accent); display: inline-block; }
+    nav button { display: block; width: 100%; text-align: left; font: inherit; color: var(--text); background: none;
+      border: 0; border-radius: 7px; padding: 8px 12px; margin-bottom: 2px; cursor: pointer; }
+    nav button:hover { background: rgba(255,255,255,.06); }
+    nav button[aria-selected="true"] { background: var(--accent); color: #fff; }
+    nav button:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+    main { overflow-y: auto; padding: 22px 28px; }
+    section[hidden] { display: none; }
+    h2 { font-size: 18px; margin: 0 0 4px; }
+    .lead { color: var(--muted); margin: 0 0 18px; }
+    fieldset { border: 1px solid var(--line); border-radius: 10px; padding: 6px 16px 10px; margin: 0 0 16px; }
+    legend { color: var(--muted); padding: 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+    .row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+    .row:last-child { border-bottom: 0; }
+    .row > label:first-child, .row > .label { flex: 1; }
+    .row small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+    input[type=text], input[type=number], select { font: inherit; color: var(--text); background: #15151a; border: 1px solid var(--line);
+      border-radius: 7px; padding: 6px 9px; }
+    input[type=number] { width: 84px; }
+    input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); }
+    input[type=range] { accent-color: var(--accent); width: 160px; }
+    .path { display: flex; gap: 6px; align-items: center; flex: 1.4; }
+    .path input { flex: 1; min-width: 0; }
+    button.btn { font: inherit; color: var(--text); background: rgba(255,255,255,.08); border: 1px solid var(--line);
+      border-radius: 7px; padding: 6px 12px; cursor: pointer; white-space: nowrap; }
+    button.btn:hover { background: rgba(255,255,255,.14); }
+    button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    button.primary:hover { filter: brightness(1.1); }
+    footer { grid-column: 2; display: flex; align-items: center; gap: 8px; padding: 12px 28px; border-top: 1px solid var(--line); background: var(--panel); }
+    #status { flex: 1; color: var(--muted); }
+    #status.bad { color: var(--bad); }
+    #status.ok { color: var(--ok); }
+    /* hotkeys */
+    .hk-group { margin-bottom: 16px; }
+    .hk { display: grid; grid-template-columns: 1fr 220px 34px; gap: 8px; align-items: center; padding: 7px 0;
+      border-bottom: 1px solid rgba(255,255,255,.05); }
+    .hk-key { font: inherit; text-align: center; color: var(--text); background: #15151a; border: 1px solid var(--line);
+      border-radius: 7px; padding: 6px 8px; cursor: pointer; min-height: 32px; }
+    .hk-key:hover { border-color: #55556a; }
+    .hk-key.listening { border-color: var(--accent); background: rgba(91,91,247,.15); color: #c9c9ff; }
+    .hk-key.empty { color: var(--muted); font-style: italic; }
+    .hk-key.conflict { border-color: var(--warn); }
+    .hk-key.taken { border-color: var(--bad); }
+    .hk-msg { grid-column: 1 / -1; font-size: 12px; margin-top: -2px; }
+    .hk-msg.warn { color: var(--warn); }
+    .hk-msg.bad { color: var(--bad); }
+    .hk-clear { font: inherit; color: var(--muted); background: none; border: 0; cursor: pointer; border-radius: 6px; height: 30px; }
+    .hk-clear:hover { color: var(--text); background: rgba(255,255,255,.08); }
+    kbd { font: 12px Consolas, monospace; background: #15151a; border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+    .note { color: var(--muted); font-size: 12px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <nav role="tablist" aria-label="Secciones">
+      <h1><span aria-hidden="true"></span>Klip</h1>
+      <button role="tab" data-tab="general" aria-selected="true">General</button>
+      <button role="tab" data-tab="capture">Capturas</button>
+      <button role="tab" data-tab="recording">Grabación</button>
+      <button role="tab" data-tab="ocr">Texto (OCR)</button>
+      <button role="tab" data-tab="hotkeys">Atajos de teclado</button>
+      <button role="tab" data-tab="about">Acerca de</button>
+    </nav>
+
+    <main>
+      <!-- ============================== General -->
+      <section data-panel="general" role="tabpanel">
+        <h2>General</h2>
+        <p class="lead">Qué pasa después de cada captura y dónde se guardan los archivos.</p>
+        <fieldset>
+          <legend>Después de capturar</legend>
+          <div class="row">
+            <label for="afterCapture">Acción<small>Qué mostrar al terminar una captura de imagen.</small></label>
+            <select id="afterCapture" data-key="general.afterCapture">
+              <option value="quick">Mostrar miniatura flotante</option>
+              <option value="editor">Abrir en el editor</option>
+              <option value="pin">Fijar en pantalla</option>
+              <option value="none">Solo guardar (y copiar)</option>
+            </select>
+          </div>
+          <div class="row">
+            <label for="autoCopy">Copiar al portapapeles automáticamente</label>
+            <input type="checkbox" id="autoCopy" data-key="general.autoCopy">
+          </div>
+          <div class="row">
+            <label for="quickPosition">Posición de la miniatura</label>
+            <select id="quickPosition" data-key="general.quickPosition">
+              <option value="left">Abajo a la izquierda</option>
+              <option value="right">Abajo a la derecha</option>
+            </select>
+          </div>
+          <div class="row">
+            <label for="quickTimeoutSec">Cerrar la miniatura tras (segundos)<small>0 = no cerrarla nunca.</small></label>
+            <input type="number" id="quickTimeoutSec" min="0" max="600" data-key="general.quickTimeoutSec">
+          </div>
+          <div class="row">
+            <label for="notifications">Mostrar notificaciones de Windows</label>
+            <input type="checkbox" id="notifications" data-key="general.notifications">
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Carpetas</legend>
+          <div class="row">
+            <label class="label" for="screenshotDir">Capturas</label>
+            <div class="path">
+              <input type="text" id="screenshotDir" data-key="general.screenshotDir" spellcheck="false">
+              <button class="btn" data-pick="screenshotDir">Elegir…</button>
+              <button class="btn" data-open="screenshotDir">Abrir</button>
+            </div>
+          </div>
+          <div class="row">
+            <label class="label" for="recordingDir">Grabaciones</label>
+            <div class="path">
+              <input type="text" id="recordingDir" data-key="general.recordingDir" spellcheck="false">
+              <button class="btn" data-pick="recordingDir">Elegir…</button>
+              <button class="btn" data-open="recordingDir">Abrir</button>
+            </div>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Sistema</legend>
+          <div class="row">
+            <label for="openAtLogin">Iniciar Klip con Windows</label>
+            <input type="checkbox" id="openAtLogin">
+          </div>
+        </fieldset>
+      </section>
+
+      <!-- ============================== Capture -->
+      <section data-panel="capture" role="tabpanel" hidden>
+        <h2>Capturas</h2>
+        <p class="lead">Formato del archivo y ayudas de la selección.</p>
+        <fieldset>
+          <legend>Archivo</legend>
+          <div class="row">
+            <label for="format">Formato<small>Las capturas de ventana con sombra siempre se guardan en PNG (transparencia).</small></label>
+            <select id="format" data-key="capture.format">
+              <option value="png">PNG (sin pérdida)</option>
+              <option value="jpg">JPG (más ligero)</option>
+            </select>
+          </div>
+          <div class="row">
+            <label for="jpgQuality">Calidad JPG</label>
+            <input type="range" id="jpgQuality" min="50" max="100" data-key="capture.jpgQuality">
+            <output id="jpgQualityOut" for="jpgQuality"></output>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Selección</legend>
+          <div class="row">
+            <label for="magnifier">Lupa con coordenadas</label>
+            <input type="checkbox" id="magnifier" data-key="capture.magnifier">
+          </div>
+          <div class="row">
+            <label for="crosshair">Líneas guía en cruz</label>
+            <input type="checkbox" id="crosshair" data-key="capture.crosshair">
+          </div>
+          <div class="row">
+            <label for="windowShadow">Sombra en capturas de ventana<small>Añade fondo transparente con sombra suave, al estilo macOS.</small></label>
+            <input type="checkbox" id="windowShadow" data-key="capture.windowShadow">
+          </div>
+          <div class="row">
+            <label for="timerSeconds">Segundos del temporizador (atajo)</label>
+            <input type="number" id="timerSeconds" min="1" max="60" data-key="capture.timerSeconds">
+          </div>
+        </fieldset>
+      </section>
+
+      <!-- ============================== Recording -->
+      <section data-panel="recording" role="tabpanel" hidden>
+        <h2>Grabación</h2>
+        <p class="lead">Vídeo en MP4 (H.264 + AAC) o GIF animado.</p>
+        <fieldset>
+          <legend>Vídeo MP4</legend>
+          <div class="row">
+            <label for="fps">Fotogramas por segundo</label>
+            <select id="fps" data-key="recording.fps" data-type="number">
+              <option value="15">15 fps</option><option value="24">24 fps</option>
+              <option value="30">30 fps</option><option value="60">60 fps</option>
+            </select>
+          </div>
+          <div class="row">
+            <label for="maxHeight">Resolución máxima</label>
+            <select id="maxHeight" data-key="recording.maxHeight" data-type="number">
+              <option value="0">Nativa</option><option value="1440">1440p</option>
+              <option value="1080">1080p</option><option value="720">720p</option>
+            </select>
+          </div>
+          <div class="row">
+            <label for="videoBitrateMbps">Calidad (Mbps)<small>Más alto = mejor imagen y archivo más grande.</small></label>
+            <input type="range" id="videoBitrateMbps" min="2" max="40" data-key="recording.videoBitrateMbps">
+            <output id="bitrateOut" for="videoBitrateMbps"></output>
+          </div>
+          <div class="row">
+            <label for="countdown">Cuenta atrás antes de grabar (s)</label>
+            <input type="number" id="countdown" min="0" max="10" data-key="recording.countdown">
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Audio y cámara</legend>
+          <div class="row">
+            <label for="systemAudio">Grabar el sonido del sistema</label>
+            <input type="checkbox" id="systemAudio" data-key="recording.systemAudio">
+          </div>
+          <div class="row">
+            <label for="microphone">Grabar micrófono</label>
+            <input type="checkbox" id="microphone" data-key="recording.microphone">
+          </div>
+          <div class="row">
+            <label for="microphoneId">Micrófono</label>
+            <select id="microphoneId" data-key="recording.microphoneId"><option value="">Predeterminado de Windows</option></select>
+          </div>
+          <div class="row">
+            <label for="webcam">Mostrar cámara (burbuja flotante)<small>Aparece sobre la pantalla y queda grabada; se puede arrastrar.</small></label>
+            <input type="checkbox" id="webcam" data-key="recording.webcam">
+          </div>
+          <div class="row">
+            <label for="webcamId">Cámara</label>
+            <select id="webcamId" data-key="recording.webcamId"><option value="">Predeterminada</option></select>
+          </div>
+          <div class="row">
+            <span class="label note">Si los nombres de los dispositivos no aparecen, pulsa “Detectar”.</span>
+            <button class="btn" id="detectDevices">Detectar dispositivos</button>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>GIF</legend>
+          <div class="row">
+            <label for="gifFps">Fotogramas por segundo</label>
+            <select id="gifFps" data-key="recording.gifFps" data-type="number">
+              <option value="8">8 fps</option><option value="10">10 fps</option>
+              <option value="12">12 fps</option><option value="15">15 fps</option><option value="20">20 fps</option>
+            </select>
+          </div>
+          <div class="row">
+            <label for="gifMaxWidth">Ancho máximo (px)</label>
+            <input type="number" id="gifMaxWidth" min="200" max="1920" step="10" data-key="recording.gifMaxWidth">
+          </div>
+          <div class="row">
+            <label for="gifMaxSeconds">Duración máxima (s)<small>El GIF se detiene solo al llegar a este límite.</small></label>
+            <input type="number" id="gifMaxSeconds" min="3" max="120" data-key="recording.gifMaxSeconds">
+          </div>
+        </fieldset>
+      </section>
+
+      <!-- ============================== OCR -->
+      <section data-panel="ocr" role="tabpanel" hidden>
+        <h2>Texto (OCR)</h2>
+        <p class="lead">Usa el reconocimiento de texto integrado en Windows: funciona sin internet.</p>
+        <fieldset>
+          <legend>Reconocimiento</legend>
+          <div class="row">
+            <label for="ocrLanguage">Idioma<small>Para más idiomas, añade el paquete de idioma en Configuración de Windows → Hora e idioma.</small></label>
+            <select id="ocrLanguage" data-key="ocr.language"><option value="">Idioma de Windows</option></select>
+          </div>
+          <div class="row">
+            <label for="keepLineBreaks">Conservar los saltos de línea</label>
+            <input type="checkbox" id="keepLineBreaks" data-key="ocr.keepLineBreaks">
+          </div>
+        </fieldset>
+      </section>
+
+      <!-- ============================== Hotkeys -->
+      <section data-panel="hotkeys" role="tabpanel" hidden>
+        <h2>Atajos de teclado</h2>
+        <p class="lead">Haz clic en un atajo y pulsa la nueva combinación. <kbd>Esc</kbd> cancela, <kbd>Retroceso</kbd> lo deja vacío.
+          Deben llevar <kbd>Ctrl</kbd>, <kbd>Alt</kbd>, <kbd>Shift</kbd> o <kbd>Win</kbd>, salvo las teclas F1–F24 e Impr Pant.</p>
+        <div id="hotkeys"></div>
+        <p class="note">Mientras esta ventana está activa, los atajos globales quedan en pausa para poder grabarlos.
+          Si un atajo sale en rojo, otra aplicación ya lo usa: elige otro.
+          Para usar <kbd>Impr Pant</kbd>, desactiva antes en Windows “Usar Impr Pant para abrir la herramienta Recortes”.</p>
+        <button class="btn" id="resetHotkeys">Restaurar atajos predeterminados</button>
+      </section>
+
+      <!-- ============================== About -->
+      <section data-panel="about" role="tabpanel" hidden>
+        <h2>Acerca de Klip</h2>
+        <p class="lead" id="version"></p>
+        <p class="note">Klip es una herramienta de capturas para Windows: capturas de área, ventana y pantalla completa,
+          editor de anotaciones, fijar en pantalla, grabación MP4/GIF y extracción de texto (OCR).</p>
+        <p class="note">La configuración se guarda en <kbd>%APPDATA%\Klip\settings.json</kbd>.</p>
+        <button class="btn" id="resetAll">Restaurar toda la configuración</button>
+      </section>
+    </main>
+
+    <footer>
+      <span id="status" role="status" aria-live="polite"></span>
+      <button class="btn" id="revert">Descartar cambios</button>
+      <button class="btn primary" id="save">Guardar</button>
+    </footer>
+  </div>
+  <script src="settings.js"></script>
+</body>
+</html>

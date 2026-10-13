@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'">
+  <title>Klip — Grabación</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; user-select: none;
+      font: 13px "Segoe UI", system-ui, sans-serif; color: #fff; }
+    .bar { position: absolute; inset: 3px; display: flex; align-items: center; gap: 6px; padding: 0 8px 0 12px;
+      background: rgba(22, 22, 28, .94); border-radius: 12px; box-shadow: 0 0 0 1px rgba(255,255,255,.1);
+      -webkit-app-region: drag; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: #ff453a; flex: none; }
+    .rec .dot { animation: blink 1.2s ease-in-out infinite; }
+    .paused .dot { background: #ffcc00; animation: none; }
+    @keyframes blink { 50% { opacity: .25; } }
+    @media (prefers-reduced-motion: reduce) { .rec .dot { animation: none; } }
+    #time { font-variant-numeric: tabular-nums; min-width: 58px; font-weight: 600; }
+    #info { color: #a0a0ad; font-size: 11px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    button { -webkit-app-region: no-drag; font: inherit; color: #fff; background: rgba(255,255,255,.1);
+      border: 0; border-radius: 8px; height: 30px; min-width: 32px; padding: 0 9px; cursor: pointer; }
+    button:hover, button:focus-visible { background: rgba(255,255,255,.2); outline: none; }
+    #stop { background: #ff453a; font-weight: 600; }
+    #stop:hover { filter: brightness(1.1); }
+    button:disabled { opacity: .4; cursor: default; }
+  </style>
+</head>
+<body>
+  <div class="bar" id="bar" role="toolbar" aria-label="Controles de grabación">
+    <span class="dot" aria-hidden="true"></span>
+    <span id="time" role="timer" aria-live="off">00:00</span>
+    <span id="info"></span>
+    <button id="pause" title="Pausar / reanudar" aria-label="Pausar" disabled>❚❚</button>
+    <button id="cancel" title="Cancelar y descartar" aria-label="Cancelar">🗑</button>
+    <button id="stop" title="Detener y guardar">■ Detener</button>
+  </div>
+  <script src="bar.js"></script>
+</body>
+</html>

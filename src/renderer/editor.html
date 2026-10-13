@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'">
+  <title>Klip — Editor</title>
+  <style>
+    :root { --bg: #1e1e24; --panel: #26262e; --line: #3a3a45; --text: #e8e8ee; --muted: #a0a0ad; --accent: #5b5bf7; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+      font: 13px "Segoe UI", system-ui, sans-serif; overflow: hidden; }
+    .layout { position: absolute; inset: 0; display: flex; flex-direction: column; }
+    header { background: var(--panel); border-bottom: 1px solid var(--line); }
+    .bar { display: flex; align-items: center; gap: 6px; padding: 6px 10px; flex-wrap: wrap; }
+    .bar + .bar { border-top: 1px solid rgba(255,255,255,.05); }
+    .group { display: flex; align-items: center; gap: 3px; padding-right: 8px; margin-right: 2px; border-right: 1px solid var(--line); }
+    .group:last-child { border-right: 0; }
+    .spacer { flex: 1; }
+    button { font: inherit; color: var(--text); background: transparent; border: 1px solid transparent;
+      border-radius: 7px; padding: 5px 8px; cursor: pointer; min-width: 30px; }
+    button:hover { background: rgba(255,255,255,.08); }
+    button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+    button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+    button.primary { background: var(--accent); color: #fff; }
+    button.primary:hover { filter: brightness(1.1); }
+    button:disabled { opacity: .4; cursor: default; }
+    .swatch { width: 20px; height: 20px; min-width: 20px; padding: 0; border-radius: 50%; border: 2px solid transparent; }
+    .swatch[aria-pressed="true"] { border-color: #fff; }
+    label { color: var(--muted); display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+    select { font: inherit; color: var(--text); background: #15151a; border: 1px solid var(--line); border-radius: 6px; padding: 3px 6px; }
+    input[type=range] { width: 90px; accent-color: var(--accent); }
+    input[type=checkbox] { accent-color: var(--accent); }
+    input[type=color] { width: 24px; height: 22px; border: 0; padding: 0; background: none; cursor: pointer; }
+    #stickers { display: none; }
+    #stickers.show { display: flex; }
+    #stickers button { font-size: 18px; padding: 2px 4px; min-width: 28px; font-family: "Segoe UI Emoji", sans-serif; }
+    .stage { position: relative; flex: 1; min-height: 0; }
+    main { position: absolute; inset: 0; overflow: auto; display: flex; padding: 24px; }
+    #wrap { position: relative; line-height: 0; margin: auto; }
+    canvas { display: block; box-shadow: 0 4px 24px rgba(0,0,0,.4); cursor: crosshair;
+      background: repeating-conic-gradient(#2c2c34 0 25%, #24242b 0 50%) 0 0 / 16px 16px; }
+    canvas.select { cursor: default; }
+    canvas.move { cursor: move; }
+    canvas.resize { cursor: nwse-resize; }
+    #text-input { position: absolute; min-width: 40px; background: rgba(0,0,0,.15); border: 1px dashed var(--accent);
+      outline: none; resize: none; overflow: hidden; padding: 0; margin: 0; line-height: 1.2;
+      font-family: "Segoe UI", system-ui, sans-serif; font-weight: 600; white-space: pre; }
+    footer { display: flex; gap: 12px; align-items: center; padding: 4px 12px; background: var(--panel);
+      border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+    #hint { flex: 1; }
+    #status { color: #c9c9ff; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <header>
+      <div class="bar" role="toolbar" aria-label="Herramientas">
+        <div class="group" id="tools">
+          <button data-tool="select" title="Seleccionar / mover / redimensionar (V)">⬚ Mover</button>
+          <button data-tool="arrow" title="Flecha (A)" aria-pressed="true">➚</button>
+          <button data-tool="curve" title="Flecha curva (Q)">⤻</button>
+          <button data-tool="line" title="Línea (L)">╱</button>
+          <button data-tool="rect" title="Rectángulo (R)">▭</button>
+          <button data-tool="ellipse" title="Elipse (E)">◯</button>
+          <button data-tool="pen" title="Lápiz (P)">✎</button>
+          <button data-tool="highlight" title="Resaltador a mano alzada (H)">🖍</button>
+          <button data-tool="hlbox" title="Resaltar zona (K)">▨</button>
+          <button data-tool="text" title="Texto (T) · doble clic en un texto para editarlo">T</button>
+          <button data-tool="counter" title="Numerar pasos (N)">①</button>
+          <button data-tool="sticker" title="Emojis y sellos (X)">😀</button>
+        </div>
+        <div class="group">
+          <button data-tool="spotlight" title="Foco: oscurece todo menos la zona (S)">◐ Foco</button>
+          <button data-tool="magnify" title="Lupa: amplía una zona en una burbuja (Z)">🔍 Lupa</button>
+          <button data-tool="blur" title="Difuminar (G)">◌ Difuminar</button>
+          <button data-tool="pixelate" title="Pixelar (B)">▦ Pixelar</button>
+          <button data-tool="crop" title="Recortar (C)">⌗</button>
+        </div>
+        <div class="group">
+          <button id="undo" title="Deshacer (Ctrl+Z)" aria-label="Deshacer">↶</button>
+          <button id="redo" title="Rehacer (Ctrl+Y)" aria-label="Rehacer">↷</button>
+          <button id="delete" title="Borrar la selección (Supr)" aria-label="Borrar selección">🗑</button>
+          <button id="clear" title="Borrar todas las anotaciones">Limpiar</button>
+        </div>
+        <div class="spacer"></div>
+        <div class="group">
+          <button id="ocr" title="Extraer y copiar el texto (Ctrl+Shift+T)">Texto (OCR)</button>
+          <button id="pin" title="Fijar encima de todo">Fijar</button>
+          <button id="copy" title="Copiar (Ctrl+C)">Copiar</button>
+          <button id="save" title="Guardar como (Ctrl+S)">Guardar…</button>
+          <button id="done" class="primary" title="Guardar, copiar y cerrar (Ctrl+Enter)">Listo</button>
+        </div>
+      </div>
+      <div class="bar" role="toolbar" aria-label="Propiedades">
+        <div class="group" id="colors" aria-label="Color">
+          <input type="color" id="customColor" value="#ff3b30" title="Otro color" aria-label="Otro color">
+        </div>
+        <div class="group">
+          <label>Grosor <input type="range" id="width" min="2" max="24" value="5" aria-label="Grosor o tamaño"></label>
+        </div>
+        <div class="group">
+          <label><input type="checkbox" id="fill"> Relleno</label>
+          <label><input type="checkbox" id="dashed"> Discontinua</label>
+          <label><input type="checkbox" id="shadow" checked> Sombra</label>
+        </div>
+        <div class="group">
+          <label>Flecha
+            <select id="arrowStyle" aria-label="Estilo de flecha">
+              <option value="end">Una punta</option>
+              <option value="both">Doble punta</option>
+              <option value="none">Sin punta</option>
+            </select>
+          </label>
+          <label>Texto
+            <select id="textStyle" aria-label="Estilo de texto">
+              <option value="outline">Con contorno</option>
+              <option value="label">Etiqueta</option>
+              <option value="plain">Simple</option>
+            </select>
+          </label>
+          <label>Número
+            <select id="counterStyle" aria-label="Estilo de los números">
+              <option value="filled">① Relleno</option>
+              <option value="outline">◯ Contorno</option>
+              <option value="letters">Ⓐ Letras</option>
+              <option value="letters-outline">Ⓐ Letras contorno</option>
+            </select>
+          </label>
+          <label>Lupa
+            <select id="zoomLevel" aria-label="Aumento de la lupa">
+              <option value="1.5">1,5×</option><option value="2" selected>2×</option>
+              <option value="3">3×</option><option value="4">4×</option>
+            </select>
+          </label>
+        </div>
+        <div class="group" id="stickers" aria-label="Emojis"></div>
+        <div class="group">
+          <button id="bg" title="Fondo decorativo con sombra y esquinas redondeadas" aria-pressed="false">Fondo</button>
+          <input type="color" id="bg1" value="#5b5bf7" aria-label="Color 1 del fondo" title="Color 1 del fondo">
+          <input type="color" id="bg2" value="#e15bf7" aria-label="Color 2 del fondo" title="Color 2 del fondo">
+          <button id="reset-crop" title="Quitar recorte">Quitar recorte</button>
+        </div>
+      </div>
+    </header>
+    <div class="stage">
+      <main id="main">
+        <div id="wrap">
+          <canvas id="canvas" aria-label="Lienzo de la captura"></canvas>
+        </div>
+      </main>
+    </div>
+    <footer>
+      <span id="hint"></span>
+      <span id="status" role="status"></span>
+      <button id="zoomFit" title="Ajustar a la ventana (Ctrl+0)">Ajustar</button>
+      <button id="zoom100" title="Tamaño real (Ctrl+1)">100%</button>
+      <span id="zoomLabel"></span>
+    </footer>
+  </div>
+  <script src="editor.js"></script>
+</body>
+</html>

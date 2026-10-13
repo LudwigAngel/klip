@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; media-src 'self' mediastream: blob:; style-src 'self' 'unsafe-inline'">
+  <title>Klip — Cámara</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; user-select: none; }
+    video { position: absolute; inset: 4px; width: calc(100% - 8px); height: calc(100% - 8px); object-fit: cover;
+      border-radius: 50%; transform: scaleX(-1); box-shadow: 0 0 0 3px #fff, 0 6px 20px rgba(0,0,0,.45);
+      background: #222; -webkit-app-region: drag; cursor: move; }
+    #err { position: absolute; inset: 4px; border-radius: 50%; display: grid; place-items: center; text-align: center;
+      padding: 20px; font: 12px "Segoe UI", sans-serif; color: #fff; background: #333; }
+    #err:empty { display: none; }
+  </style>
+</head>
+<body>
+  <video id="v" autoplay muted playsinline aria-label="Vista de la cámara"></video>
+  <div id="err" role="status"></div>
+  <script src="webcam.js"></script>
+</body>
+</html>

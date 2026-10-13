@@ -1,0 +1,82 @@
+{
+  "name": "klip",
+  "productName": "Klip",
+  "version": "0.3.0",
+  "description": "Herramienta de capturas de pantalla para Windows: captura, anota, fija, graba y extrae texto.",
+  "author": "LudwigAngel",
+  "license": "MIT",
+  "homepage": "https://github.com/LudwigAngel/klip",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LudwigAngel/klip.git"
+  },
+  "bugs": {
+    "url": "https://github.com/LudwigAngel/klip/issues"
+  },
+  "main": "src/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "smoke": "set KLIP_SMOKE=1&& electron .",
+    "check": "node scripts/check.mjs",
+    "icon": "node scripts/make-icon.mjs",
+    "dist": "node scripts/check.mjs && node scripts/make-icon.mjs && electron-builder --win nsis --x64",
+    "dist:dir": "node scripts/make-icon.mjs && electron-builder --win dir --x64"
+  },
+  "devDependencies": {
+    "electron": "44.7.0",
+    "electron-builder": "26.15.3"
+  },
+  "allowScripts": {
+    "electron@44.7.0": true
+  },
+  "dependencies": {
+    "gifenc": "1.0.3"
+  },
+  "build": {
+    "appId": "dev.klip.app",
+    "productName": "Klip",
+    "copyright": "Uso personal",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "package.json",
+      "!**/*.map"
+    ],
+    "asarUnpack": [
+      "src/*.ps1"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "Klip-Setup-${version}.${ext}",
+      "signAndEditExecutable": true
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Klip",
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "language": "3082",
+      "multiLanguageInstaller": false
+    }
+  }
+}

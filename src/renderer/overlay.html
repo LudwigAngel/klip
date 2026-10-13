@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'">
+  <title>Klip — Selección</title>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #000; cursor: crosshair; user-select: none; }
+    canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+    #hint {
+      position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+      font: 13px/1.4 "Segoe UI", system-ui, sans-serif; color: #fff; background: rgba(20, 20, 28, .82);
+      padding: 8px 14px; border-radius: 8px; pointer-events: none; transition: opacity .2s;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="c" aria-label="Captura de pantalla congelada; arrastra para seleccionar un área"></canvas>
+  <div id="hint" role="status">Arrastra para seleccionar · Clic para la pantalla completa · Esc para cancelar</div>
+  <script src="overlay.js"></script>
+</body>
+</html>

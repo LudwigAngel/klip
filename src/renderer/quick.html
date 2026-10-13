@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'">
+  <title>Klip — Captura</title>
+  <style>
+    :root { --accent: #5b5bf7; }
+    html, body { margin: 0; height: 100%; background: transparent; overflow: hidden;
+      font: 12px "Segoe UI", system-ui, sans-serif; user-select: none; }
+    .card {
+      position: absolute; inset: 6px; border-radius: 12px; overflow: hidden;
+      background: #1e1e24; box-shadow: 0 6px 20px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.08);
+      animation: in-left .22s ease-out;
+    }
+    body.right .card { animation-name: in-right; }
+    @keyframes in-left { from { transform: translateX(-30px); opacity: 0; } to { transform: none; opacity: 1; } }
+    @keyframes in-right { from { transform: translateX(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .card { animation: none; } }
+    img { width: 100%; height: 100%; object-fit: contain; display: block; background: #2a2a33; cursor: grab; }
+    .badge { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); background: #e53935; color: #fff;
+      font-weight: 600; font-size: 11px; padding: 2px 8px; border-radius: 6px; display: none; }
+    body.video .badge { display: block; }
+    .actions {
+      position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 7px;
+      align-content: center; padding: 18px 24px; background: rgba(15, 15, 20, .74);
+      opacity: 0; transition: opacity .15s;
+    }
+    .card:hover .actions, .card:focus-within .actions { opacity: 1; }
+    button {
+      font: inherit; color: #fff; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18);
+      border-radius: 8px; padding: 7px 6px; cursor: pointer;
+    }
+    button:hover, button:focus-visible { background: var(--accent); border-color: var(--accent); outline: none; }
+    .wide { grid-column: span 2; }
+    body.video [data-only="image"], body:not(.video) [data-only="video"] { display: none; }
+    .corner { position: absolute; top: 6px; width: 26px; height: 26px; padding: 0; border-radius: 50%;
+      background: rgba(15,15,20,.85); opacity: 0; transition: opacity .15s; }
+    .card:hover .corner, .card:focus-within .corner { opacity: 1; }
+    #close { left: 6px; }
+    #del { right: 6px; }
+    .meta { position: absolute; left: 0; right: 0; bottom: 0; padding: 4px 8px; color: #ddd;
+      background: linear-gradient(transparent, rgba(0,0,0,.7)); font-size: 11px; pointer-events: none; }
+    .toast { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); color: #fff;
+      background: var(--accent); padding: 6px 12px; border-radius: 8px; opacity: 0; transition: opacity .15s;
+      pointer-events: none; white-space: nowrap; }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <img id="thumb" alt="Miniatura" draggable="true">
+    <div class="badge">● GRABACIÓN</div>
+    <div class="meta" id="meta"></div>
+    <div class="actions">
+      <button data-a="copy" data-only="image" title="Copiar al portapapeles (Ctrl+C)">Copiar</button>
+      <button data-a="save" title="Guardar como… (Ctrl+S)">Guardar</button>
+      <button data-a="edit" data-only="image" title="Anotar en el editor (doble clic)">Editar</button>
+      <button data-a="pin" data-only="image" title="Fijar encima de todo">Fijar</button>
+      <button data-a="ocr" data-only="image" title="Extraer el texto de la captura" class="wide">Extraer texto (OCR)</button>
+      <button data-a="open" data-only="video" title="Abrir con el reproductor">Reproducir</button>
+      <button data-a="reveal" title="Mostrar en la carpeta" class="wide">Mostrar en carpeta</button>
+    </div>
+    <button class="corner" id="close" data-a="close" title="Cerrar (Esc)" aria-label="Cerrar">✕</button>
+    <button class="corner" id="del" data-a="delete" title="Eliminar archivo" aria-label="Eliminar archivo">🗑</button>
+    <div class="toast" id="toast" role="status"></div>
+  </div>
+  <script src="quick.js"></script>
+</body>
+</html>
