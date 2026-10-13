@@ -10,6 +10,24 @@ compartirla. ¡Las contribuciones son bienvenidas!
 > código, diseños ni recursos suyos: todo se escribió desde cero tomando solo la *idea* de las funciones.
 > CleanShot X es marca de sus respectivos dueños.
 
+![Editor de Klip con flechas, texto, números de pasos, lupa, resaltado y difuminado](docs/screenshots/editor.png)
+
+## Capturas de pantalla
+
+| Miniatura tras capturar | Barra de grabación |
+|---|---|
+| ![Miniatura flotante con acciones rápidas](docs/screenshots/quick.png) | ![Barra de control durante la grabación](docs/screenshots/recording-bar.png) |
+
+| Atajos de teclado configurables | Opciones de grabación |
+|---|---|
+| ![Configuración de atajos de teclado](docs/screenshots/settings-hotkeys.png) | ![Configuración de grabación MP4 y GIF](docs/screenshots/settings-recording.png) |
+
+| Texto reconocido (OCR) |
+|---|
+| ![Resultado del OCR listo para copiar](docs/screenshots/ocr.png) |
+
+Las imágenes se generan con datos de ejemplo: `set KLIP_SCREENSHOTS=docs\screenshots&& npx electron .`
+
 ## Funciones
 
 **Capturas**

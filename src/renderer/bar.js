@@ -21,7 +21,7 @@ window.klip.onBarInit((d) => {
   const parts = [d.gif ? 'GIF' : 'MP4'];
   if (!d.gif && d.microphone) parts.push('🎙 mic');
   if (!d.gif && d.systemAudio) parts.push('🔊 sistema');
-  if (d.hotkeyStop) parts.push(`detener: ${d.hotkeyStop}`);
+  if (d.hotkeyStop) document.getElementById('stop').title = `Detener y guardar (${d.hotkeyStop})`;
   info.textContent = parts.join(' · ');
 });
 
