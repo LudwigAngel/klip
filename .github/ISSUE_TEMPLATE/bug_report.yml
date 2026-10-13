@@ -1,0 +1,78 @@
+name: 🐛 Reportar un error
+description: Algo no funciona como debería en Klip.
+title: "[Error] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ¡Gracias por ayudar a mejorar Klip! Cuanto más detalle, más rápido se arregla.
+        Antes de enviar, revisa que no exista ya un [issue parecido](https://github.com/LudwigAngel/klip/issues).
+  - type: textarea
+    id: what
+    attributes:
+      label: ¿Qué pasó?
+      description: Describe el problema y qué esperabas que ocurriera.
+      placeholder: Al pulsar Ctrl+Shift+2 en el segundo monitor, la selección aparece desplazada…
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos para reproducirlo
+      placeholder: |
+        1. Abre Klip
+        2. Pulsa …
+        3. Verás …
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Función afectada
+      options:
+        - Captura de área / pantalla / ventana
+        - Editor de imágenes
+        - Grabación MP4
+        - Grabación GIF
+        - OCR (extraer texto)
+        - Fijar en pantalla
+        - Atajos de teclado
+        - Configuración
+        - Instalador / inicio con Windows
+        - Otra
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Versión de Klip
+      description: Configuración → Acerca de.
+      placeholder: "0.3.1"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Versión de Windows
+      description: Pulsa Win+R y escribe `winver`.
+      placeholder: Windows 11 23H2
+    validations:
+      required: true
+  - type: textarea
+    id: setup
+    attributes:
+      label: Tu configuración
+      description: Monitores, escalado (100 %, 150 %…), si usas Escritorio remoto o una máquina virtual, etc.
+  - type: textarea
+    id: media
+    attributes:
+      label: Capturas o vídeo
+      description: Arrastra aquí imágenes o un GIF que muestre el problema. Revisa que no contengan datos privados.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Comprobaciones
+      options:
+        - label: He buscado y no hay un issue igual.
+          required: true

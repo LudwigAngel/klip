@@ -1,0 +1,33 @@
+name: 💡 Proponer una idea
+description: Una función nueva o una mejora para Klip.
+title: "[Idea] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: ¿Qué problema resuelve?
+      description: Cuéntanos qué intentas hacer y qué te lo impide hoy.
+      placeholder: Cuando grabo tutoriales no se ve dónde hago clic…
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: ¿Cómo te imaginas la solución?
+      placeholder: Un círculo que aparezca en cada clic durante la grabación, con opción para activarlo…
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas o referencias
+      description: Otras apps que lo hacen bien, capturas de cómo se vería, etc.
+  - type: dropdown
+    id: help
+    attributes:
+      label: ¿Te gustaría implementarlo?
+      options:
+        - Sí, quiero enviar un pull request
+        - Podría ayudar a probarlo
+        - No, solo lo propongo

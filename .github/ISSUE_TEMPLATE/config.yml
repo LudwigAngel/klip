@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 📖 Guía de contribución
+    url: https://github.com/LudwigAngel/klip/blob/main/CONTRIBUTING.md
+    about: Cómo preparar el entorno, probar y enviar cambios.
+  - name: ⬇️ Descargar Klip
+    url: https://github.com/LudwigAngel/klip/releases
+    about: El instalador más reciente para Windows.
