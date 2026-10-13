@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="256" height="256" role="img" aria-label="Klip">
+  <defs>
+    <linearGradient id="klip-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5B5BF7"/>
+      <stop offset="1" stop-color="#E15BF7"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#klip-bg)"/>
+  <path d="M13 21V13H21M43 13H51V21M51 43V51H43M21 51H13V43" fill="none" stroke="#fff" stroke-opacity=".78"
+        stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M26 21V43M39 21L28 32L39 43" fill="none" stroke="#fff" stroke-width="6"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

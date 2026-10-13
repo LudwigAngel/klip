@@ -742,7 +742,7 @@ function openFrameWindow(r) {
 }
 
 function openControlBar(r, fullscreen) {
-  const W = 330, H = 46;
+  const W = 420, H = 46;
   const display = screen.getDisplayNearestPoint({ x: r.x + r.width / 2, y: r.y + r.height / 2 });
   const wa = display.workArea;
   let x = Math.round(r.x + r.width / 2 - W / 2);
@@ -1131,6 +1131,110 @@ async function smokeTest() {
   app.exit(0);
 }
 
+// ================================================================ README screenshots
+
+/** Demo content for screenshots: a fake dashboard, so no real desktop is shown. */
+const DEMO_HTML = `<!doctype html><html><head><meta charset="utf-8"><style>
+  body{margin:0;font:15px "Segoe UI",sans-serif;background:#f4f5fb;color:#1d1d2b}
+  .top{height:56px;background:#fff;display:flex;align-items:center;gap:14px;padding:0 24px;box-shadow:0 1px 0 #e3e4ee}
+  .logo{width:28px;height:28px;border-radius:8px;background:#5b5bf7}.top b{font-size:17px}.sp{flex:1}
+  .btn{background:#5b5bf7;color:#fff;border-radius:8px;padding:9px 18px;font-weight:600}
+  .grid{display:grid;grid-template-columns:2fr 1fr;gap:20px;padding:24px}
+  .card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  h2{margin:0 0 4px;font-size:18px}.muted{color:#7b7c92;font-size:13px}
+  .bars{display:flex;align-items:flex-end;gap:16px;height:250px;margin-top:20px}
+  .bars div{flex:1;border-radius:8px 8px 0 0;background:#c9c9ff}.bars .hi{background:#5b5bf7}
+  .labels{display:flex;gap:16px;margin-top:8px;color:#7b7c92;font-size:12px}.labels span{flex:1;text-align:center}
+  .row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #eee}
+  .kpi{font-size:34px;font-weight:700;margin:6px 0}.up{color:#1f9d55;font-weight:600}
+</style></head><body>
+<div class="top"><div class="logo"></div><b>Panel de ventas</b><span class="muted">Trimestre 3 · 2026</span><div class="sp"></div><div class="btn">Exportar informe</div></div>
+<div class="grid">
+ <div class="card"><h2>Ingresos mensuales</h2><div class="muted">En miles de dólares</div>
+  <div class="bars"><div style="height:45%"></div><div style="height:60%"></div><div style="height:52%"></div><div style="height:70%"></div><div class="hi" style="height:92%"></div><div style="height:66%"></div></div>
+  <div class="labels"><span>Abr</span><span>May</span><span>Jun</span><span>Jul</span><span>Ago</span><span>Sep</span></div></div>
+ <div class="card"><h2>Resumen</h2><div class="kpi">$ 184 320</div><div class="up">▲ 12,4 % vs. trimestre anterior</div>
+  <div class="row"><span>Clientes nuevos</span><b>248</b></div><div class="row"><span>Ticket medio</span><b>$ 742</b></div>
+  <div class="row"><span>Contacto</span><b>ana.garcia@ejemplo.com</b></div><div class="row"><span>Tarjeta</span><b>4111 2222 3333 4444</b></div></div>
+</div></body></html>`;
+
+async function renderDemoImage() {
+  const win = new BrowserWindow({ width: 1280, height: 720, show: false, webPreferences: { sandbox: true, offscreen: true } });
+  await win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(DEMO_HTML)}`);
+  await sleep(600);
+  const img = await win.webContents.capturePage();
+  win.destroy();
+  return img;
+}
+
+async function shoot(win, file, dir) {
+  await sleep(900);
+  const img = await win.webContents.capturePage();
+  fs.writeFileSync(path.join(dir, file), img.toPNG());
+  return `${file} ${JSON.stringify(img.getSize())}`;
+}
+
+async function screenshotMode(dir) {
+  ensureDir(dir);
+  const out = [];
+  const image = await renderDemoImage();
+  const id = 'demo';
+  captures.set(id, { id, kind: 'image', file: path.join(app.getPath('temp'), 'klip-demo.png'), image });
+
+  // 1. Editor with a typical annotated screenshot
+  openEditor(id);
+  await sleep(1500);
+  const ed = BrowserWindow.getAllWindows().find((w) => w.getTitle().startsWith('Klip — Editor'));
+  ed.setSize(1280, 860);
+  await ed.webContents.executeJavaScript(`(() => {
+    const st = { width: 5, dashed: false, shadow: true };
+    addObject({ type: 'rect', ...st, color: '#ff3b30', fill: false, x1: 1098, y1: 10, x2: 1274, y2: 46 });
+    addObject({ type: 'curve', ...st, color: '#ff3b30', heads: 'end', x1: 960, y1: 96, x2: 1150, y2: 52, cx: 1090, cy: 104 });
+    addObject({ type: 'text', x: 650, y: 78, size: 28, color: '#ff3b30', style: 'label', shadow: true, text: 'Descarga el informe' });
+    addObject({ type: 'counter', color: '#5b5bf7', width: 6, shadow: true, cstyle: 'filled', x: 545, y: 200 });
+    addObject({ type: 'hlbox', ...st, color: '#ffcc00', x1: 868, y1: 128, x2: 1060, y2: 178 });
+    addObject({ type: 'counter', color: '#5b5bf7', width: 6, shadow: true, cstyle: 'filled', x: 1085, y: 152 });
+    addObject({ type: 'magnify', ...st, color: '#5b5bf7', zoom: 2, x1: 893, y1: 180, x2: 1010, y2: 206, bx: 960, by: 560 });
+    addObject({ type: 'blur', ...st, color: '#ff3b30', x1: 1050, y1: 300, x2: 1244, y2: 375 });
+    addObject({ type: 'sticker', emoji: '🔒', color: '#000', width: 0, x1: 1005, y1: 318, x2: 1045, y2: 358 });
+    addObject({ type: 'counter', color: '#5b5bf7', width: 6, shadow: true, cstyle: 'filled', x: 985, y: 338 });
+    ui.bg.click();
+    selectedId = null; setTool('arrow'); render(); fit();
+  })()`);
+  out.push(await shoot(ed, 'editor.png', dir));
+
+  // 2. Quick-access card
+  showQuickWindow(id);
+  await sleep(800);
+  const quick = quickWindows[quickWindows.length - 1];
+  out.push(await shoot(quick, 'quick.png', dir));
+  quick.close();
+
+  // 3. Settings: hotkeys and recording tabs
+  openSettings('hotkeys');
+  await sleep(1500);
+  settingsWin.setSize(900, 760);
+  out.push(await shoot(settingsWin, 'settings-hotkeys.png', dir));
+  settingsWin.webContents.send('settings:tab', 'recording');
+  out.push(await shoot(settingsWin, 'settings-recording.png', dir));
+
+  // 4. OCR result
+  openOcrResult({ text: 'Panel de ventas\r\nTrimestre 3 · 2026\r\nIngresos mensuales\r\n$ 184 320\r\n▲ 12,4 % vs. trimestre anterior', lines: 5, language: 'es-MX' });
+  await sleep(800);
+  const ocrWin = BrowserWindow.getAllWindows().find((w) => w.webContents.getURL().endsWith('ocr.html'));
+  out.push(await shoot(ocrWin, 'ocr.png', dir));
+
+  // 5. Recording control bar
+  const bar = new BrowserWindow({ width: 420, height: 46, frame: false, transparent: true, show: true, skipTaskbar: true, webPreferences: webPrefs() });
+  await bar.loadFile(path.join(RENDERER, 'bar.html'));
+  bar.webContents.send('bar:init', { gif: false, microphone: true, systemAudio: true, hotkeyStop: 'Ctrl+Shift+5' });
+  bar.webContents.send('rec:state', { paused: false, startedAt: Date.now() - 83000, pausedMs: 0, pausedAt: 0 });
+  out.push(await shoot(bar, 'recording-bar.png', dir));
+
+  out.forEach((l) => console.log(`SHOT ${l}`));
+  app.exit(0);
+}
+
 // ================================================================ app shell
 
 if (!app.requestSingleInstanceLock()) {
@@ -1151,6 +1255,7 @@ if (!app.requestSingleInstanceLock()) {
     tray.on('right-click', () => tray.popUpContextMenu(buildTrayMenu()));
     hotkeyErrors = registerHotkeys();
     if (SMOKE) return smokeTest();
+    if (process.env.KLIP_SCREENSHOTS) return screenshotMode(process.env.KLIP_SCREENSHOTS);
     if (hotkeyErrors.length) {
       const names = hotkeyErrors.map((id) => settingsStore.HOTKEY_ACTIONS.find((a) => a.id === id)?.label).join(', ');
       notify('Klip — atajos ocupados', `No se pudieron registrar: ${names}. Cámbialos en Configuración.`);

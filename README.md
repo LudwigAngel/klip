@@ -1,6 +1,8 @@
-# Klip
+<p align="center"><img src="docs/logo.svg" width="112" height="112" alt="Logo de Klip"></p>
 
-**Herramienta gratuita y de código abierto para capturas y grabaciones de pantalla en Windows.**
+<h1 align="center">Klip</h1>
+
+<p align="center"><b>Herramienta gratuita y de código abierto para capturas y grabaciones de pantalla en Windows.</b></p>
 
 Klip nace como un aporte a la comunidad: una alternativa libre para Windows inspirada en el flujo de trabajo de
 [CleanShot X](https://cleanshot.com), la conocida app de macOS. Es para quien quiera usarla, estudiarla, mejorarla o
@@ -9,6 +11,24 @@ compartirla. ¡Las contribuciones son bienvenidas!
 > Klip es un proyecto independiente. **No está afiliado ni respaldado por CleanShot X ni por MTW**, y no contiene
 > código, diseños ni recursos suyos: todo se escribió desde cero tomando solo la *idea* de las funciones.
 > CleanShot X es marca de sus respectivos dueños.
+
+![Editor de Klip con flechas, texto, números de pasos, lupa, resaltado y difuminado](docs/screenshots/editor.png)
+
+## Capturas de pantalla
+
+| Miniatura tras capturar | Barra de grabación |
+|---|---|
+| ![Miniatura flotante con acciones rápidas](docs/screenshots/quick.png) | ![Barra de control durante la grabación](docs/screenshots/recording-bar.png) |
+
+| Atajos de teclado configurables | Opciones de grabación |
+|---|---|
+| ![Configuración de atajos de teclado](docs/screenshots/settings-hotkeys.png) | ![Configuración de grabación MP4 y GIF](docs/screenshots/settings-recording.png) |
+
+| Texto reconocido (OCR) |
+|---|
+| ![Resultado del OCR listo para copiar](docs/screenshots/ocr.png) |
+
+Las imágenes se generan con datos de ejemplo: `set KLIP_SCREENSHOTS=docs\screenshots&& npx electron .`
 
 ## Funciones
 
